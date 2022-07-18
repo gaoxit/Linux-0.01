@@ -76,8 +76,8 @@ struct tss_struct {
 
 struct task_struct {
 /* these are hardcoded - don't touch */
-	long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
-	long counter;
+	long state;		/* -1 unrunnable, 0 runnable, >0 stopped 任务的运行状态*/
+	long counter;	/* 任务运行时间计数 */
 	long priority;
 	long signal;
 	fn_ptr sig_restorer;
