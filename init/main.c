@@ -39,7 +39,7 @@ extern int vsprintf();
 extern void init(void);
 extern void hd_init(void);
 extern long kernel_mktime(struct tm * tm);
-extern long startup_time;
+extern long startup_time;	//系统滴答全局变量
 
 /*
  * Yeah, yeah, it's ugly, but I cannot find how to do this correctly

@@ -99,7 +99,8 @@ void schedule(void)
 		for(p = &LAST_TASK ; p > &FIRST_TASK ; --p)
 			if (*p)
 				(*p)->counter = ((*p)->counter >> 1) +
-						(*p)->priority;
+						(*p)->priority;					
+		//根据时间片=时间片*2+优先级 来进行排序，最大的先执行 称为[优先级时间片轮转算法]
 	}
 	switch_to(next);
 }
@@ -158,10 +159,10 @@ void wake_up(struct task_struct **p)
 
 void do_timer(long cpl)
 {
-	if (cpl)
-		current->utime++;
+	if (cpl)				//cpl用来表示被中断程序的特权。0表示内核进程；1表示用户进程
+		current->utime++;	//utime表示用户程序时间
 	else
-		current->stime++;
+		current->stime++;	//stime表示内核程序时间
 	if ((--current->counter)>0) return;
 	current->counter=0;
 	if (!cpl) return;

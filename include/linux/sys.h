@@ -77,4 +77,4 @@ sys_rmdir, sys_dup, sys_pipe, sys_times, sys_prof, sys_brk, sys_setgid,
 sys_getgid, sys_signal, sys_geteuid, sys_getegid, sys_acct, sys_phys,
 sys_lock, sys_ioctl, sys_fcntl, sys_mpx, sys_setpgid, sys_ulimit,
 sys_uname, sys_umask, sys_chroot, sys_ustat, sys_dup2, sys_getppid,
-sys_getpgrp,sys_setsid};
+sys_getpgrp,sys_setsid};    //system_call.s调用的回调表格

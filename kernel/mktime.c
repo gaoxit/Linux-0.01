@@ -6,6 +6,7 @@
  * is ok. Similarly, TZ etc is happily ignored. We just do everything
  * as easily as possible. Let's find something public for the library
  * routines (although I think minix times is public).
+ * 打印从1970年1月1日0时到当前的秒数
  */
 /*
  * PS. I hate whoever though up the year 1970 - couldn't they have gotten
@@ -31,6 +32,11 @@ static int month[12] = {
 	DAY*(31+29+31+30+31+30+31+31+30+31),
 	DAY*(31+29+31+30+31+30+31+31+30+31+30)
 };
+
+/*
+ * kernel_mktime的参数是从硬件中得到
+ */
+
 
 long kernel_mktime(struct tm * tm)
 {

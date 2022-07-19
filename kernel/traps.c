@@ -171,6 +171,9 @@ void trap_init(void)
 {
 	int i;
 
+	/*
+	 * set_trap_gate和set_system_gate的不同是级别区别，trap的级别是0(高)，用户访问；system的级别是3(低)，系统访问
+	 */
 	set_trap_gate(0,&divide_error);
 	set_trap_gate(1,&debug);
 	set_trap_gate(2,&nmi);

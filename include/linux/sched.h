@@ -77,8 +77,8 @@ struct tss_struct {
 struct task_struct {
 /* these are hardcoded - don't touch */
 	long state;		/* -1 unrunnable, 0 runnable, >0 stopped 任务的运行状态*/
-	long counter;	/* 任务运行时间计数 */
-	long priority;
+	long counter;	/* 任务运行时间计数，进程的时间片 */
+	long priority;	/* 任务的优先级 */
 	long signal;
 	fn_ptr sig_restorer;
 	fn_ptr sig_fn[32];
@@ -101,7 +101,7 @@ struct task_struct {
 /* ldt for this task 0 - zero 1 - cs 2 - ds&ss */
 	struct desc_struct ldt[3];
 /* tss for this task */
-	struct tss_struct tss;
+	struct tss_struct tss;	/* 进程状态描述符(进程运行过程中内核需要知道的状态) 程序状态段 */
 };
 
 /*
