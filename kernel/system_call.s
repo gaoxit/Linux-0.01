@@ -155,13 +155,13 @@ _timer_interrupt:
 	mov %ax,%es
 	movl $0x17,%eax
 	mov %ax,%fs
-	incl _jiffies
+	incl _jiffies		# 1. 将系统滴答数jiffies变量加1
 	movb $0x20,%al		# EOI to interrupt controller #1
 	outb %al,$0x20
 	movl CS(%esp),%eax
 	andl $3,%eax		# %eax is CPL (0 or 3, 0=supervisor)
 	pushl %eax
-	call _do_timer		# 'do_timer(long CPL)' does everything from
+	call _do_timer		# 'do_timer(long CPL)' does everything from  2.调用do_timer函数
 	addl $4,%esp		# task switching to accounting ...
 	jmp ret_from_sys_call
 

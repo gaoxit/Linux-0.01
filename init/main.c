@@ -85,12 +85,12 @@ void main(void)		/* This really IS void, no error here. */
 	time_init();
 	tty_init();
 	trap_init();
-	sched_init();
+	sched_init();		//【进程相关】1.进程调度初始化
 	buffer_init();
 	hd_init();
 	sti();
 	move_to_user_mode();
-	if (!fork()) {		/* we count on this going ok */
+	if (!fork()) {		/* we count on this going ok  【进程相关】2.创建一个进程并做一些事情(与进程关系不大，主要是最终执行到shell程序等待用户输入)*/
 		init();
 	}
 /*
@@ -100,7 +100,7 @@ void main(void)		/* This really IS void, no error here. */
  * can run). For task0 'pause()' just means we go check if some other
  * task can run, and if not we return here.
  */
-	for(;;) pause();
+	for(;;) pause();	//【进程相关】3.死循环，操作系统正式启动完毕，%反映了操作系统的本质，即一个中断驱动的死循环代码%
 }
 
 static int printf(const char *fmt, ...)

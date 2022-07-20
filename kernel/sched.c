@@ -64,6 +64,11 @@ void math_state_restore()
  *   NOTE!!  Task 0 is the 'idle' task, which gets called when no other
  * tasks can run. It can not be killed, and it cannot sleep. The 'state'
  * information in task[0] is never used.
+ *
+ * 该函数主要做的三件事：
+ * 1. int next = get_max_counter_from_runnanle();	获取剩余时间片(counter值)最大且在runnable状态(state=0)的进程号next；
+ * 2. refesh_all_thread_counter();					如果所有的时间片都为0，则将所有的进程(不止是runnable状态的进程)的counter重新赋值，然后再执行步骤1；
+ * 3. switch_to(next);								获得一个进程号next，调用swich_to，切换到还进程中去执行。
  */
 void schedule(void)
 {
@@ -100,7 +105,7 @@ void schedule(void)
 			if (*p)
 				(*p)->counter = ((*p)->counter >> 1) +
 						(*p)->priority;					
-		//根据时间片=时间片*2+优先级 来进行排序，最大的先执行 称为[优先级时间片轮转算法]
+		//根据时间片=时间片/2+优先级 来进行排序，最大的先执行 称为[优先级时间片轮转算法]
 	}
 	switch_to(next);
 }
@@ -159,13 +164,16 @@ void wake_up(struct task_struct **p)
 
 void do_timer(long cpl)
 {
+	// CPL(Current Privilege Level)，表示正在执行代码所在段的特权级别，存在于cs段的低两位
 	if (cpl)				//cpl用来表示被中断程序的特权。0表示内核进程；1表示用户进程
 		current->utime++;	//utime表示用户程序时间
 	else
 		current->stime++;	//stime表示内核程序时间
+	/* 1.先将当前进程的时间片-1，如果剩余时间片仍>0，直接返回 */
 	if ((--current->counter)>0) return;
-	current->counter=0;
-	if (!cpl) return;
+	current->counter=0;		//如果-1之后时间片<0，则将时间片赋值为0
+	if (!cpl) return;		//如果是内核进程，则直接返回
+	/* 2.若没有剩余时间片，则进行调度 */
 	schedule();
 }
 
@@ -234,10 +242,10 @@ void sched_init(void)
 	int i;
 	struct desc_struct * p;
 
-	set_tss_desc(gdt+FIRST_TSS_ENTRY,&(init_task.task.tss));
+	set_tss_desc(gdt+FIRST_TSS_ENTRY,&(init_task.task.tss));	//初始化第一个进程的tss
 	set_ldt_desc(gdt+FIRST_LDT_ENTRY,&(init_task.task.ldt));
 	p = gdt+2+FIRST_TSS_ENTRY;
-	for(i=1;i<NR_TASKS;i++) {
+	for(i=1;i<NR_TASKS;i++) {									//将进程数组清零
 		task[i] = NULL;
 		p->a=p->b=0;
 		p++;
@@ -249,7 +257,7 @@ void sched_init(void)
 	outb_p(0x36,0x43);		/* binary, mode 3, LSB/MSB, ch 0 */
 	outb_p(LATCH & 0xff , 0x40);	/* LSB */
 	outb(LATCH >> 8 , 0x40);	/* MSB */
-	set_intr_gate(0x20,&timer_interrupt);
+	set_intr_gate(0x20,&timer_interrupt);	//0x20为时钟中断，当该中断来临时，CPU会查找中断向量表中0x20处的函数地址，即_timer_interrupt
 	outb(inb_p(0x21)&~0x01,0x21);
 	set_system_gate(0x80,&system_call);
 }

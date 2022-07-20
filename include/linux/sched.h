@@ -2,7 +2,7 @@
 #define _SCHED_H
 
 #define NR_TASKS 64
-#define HZ 100
+#define HZ 100		//频率100hz，每个tick 10ms
 
 #define FIRST_TASK task[0]
 #define LAST_TASK task[NR_TASKS-1]
@@ -77,7 +77,7 @@ struct tss_struct {
 struct task_struct {
 /* these are hardcoded - don't touch */
 	long state;		/* -1 unrunnable, 0 runnable, >0 stopped 任务的运行状态*/
-	long counter;	/* 任务运行时间计数，进程的时间片 */
+	long counter;	/* 任务运行时间计数，进程的剩余时间片 */
 	long priority;	/* 任务的优先级 */
 	long signal;
 	fn_ptr sig_restorer;
@@ -164,6 +164,9 @@ __asm__("str %%ax\n\t" \
  * checking that n isn't the current task, in which case it does nothing.
  * This also clears the TS-flag if the task we switched to has used
  * tha math co-processor latest.
+ * 
+ * 1. 通过ljmp跳转到新锦成的偏移地址处
+ * 2. 将当前各个寄存器的值保存在当前进程的TSS中，并将新进程的TSS加载到各个寄存器
  */
 #define switch_to(n) {\
 struct {long a,b;} __tmp; \
